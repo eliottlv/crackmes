@@ -1,7 +1,14 @@
 BITS 64
 %use altreg
 
-; Constants for switch cases
+; TODO :
+; - détection de débugeur (autre que ptrace).
+; - plusieurs rounds de déchiffrement avec des clés différentes.
+; - calcul des adresses de jump à l'exécution (avec xor des adresses avec une clé).
+; - chiffrement du code avec une page mémoire rwx.
+; - Plusieurs rounds de hashage.
+; - Hash sur 128 octets.
+
 %define loop_junk_bytes             0x511138d1
 %define loop_print_prompt           0xfb439931
 %define loop_fake_print_prompt      0x08fb90bf
@@ -14,6 +21,8 @@ BITS 64
 %define loop_exit_2                 0x8dff7d3f
 %define loop_dbg_found              0x1221a352
 %define loop_fake_dbg_found         0xc87d5f58
+; %define loop_decrypt_code           0x85b34862
+; %define loop_fake_decrypt_code      0x1044761d
 %define loop_failed                 0x72605214
 %define loop_fake_failed            0x02fe318b
 %define loop_success                0xa5db20db
@@ -96,6 +105,21 @@ BITS 64
     cmp rcx, %2-2
     jne .decrypt_loop_%1
 %endmacro
+
+; %macro decrypt_data 0
+;     mov rax, [_code+rcx]
+;     mov rbx, [key]
+;     xor rax, rbx
+;     mov [_code+rcx], rax
+;     add rcx, 8
+;     mov r2d, loop_decrypt_code
+;     mov r5d, loop_check_pass
+;     cmp rcx, len_code
+;     cmovne r15d, r2d
+;     cmove r15d, r5d
+;     xor r2, r2
+;     mov r5, r2
+; %endmacro
 
 ; Calculate hash
 %macro hash 1
@@ -201,6 +225,9 @@ section .data
     ; ./encryptor.py "Failed !"\n + key
     msg_failed dw           0xa46f,0xd1ef,0x8b44,0x1ba9,0x04e2,0xe20e
     len_failed equ          $-msg_failed
+    ; check_failed_callkey dq             0x99e0251e08e0e7b2
+    ; check_succes_callkey dq             0x4fd7fe1f8d6e5ea2
+    ;key dq                              0x7af8eab5b4f28eb5      ; Key to decrypt .code
     real_hash dq	                    0xa33bca10f42fa712      ; Pwd : @vKZ6&@G49eK!7*3
     init1 dd		                    0x6a736414
 	init2 dd		                    0xb0a2b143
@@ -270,6 +297,8 @@ _start:
     je .print_prompt
     cmp r15d, loop_fake_failed
     je .print_failed
+    ; cmp r15d, loop_decrypt_code
+    ; je .decrypt_code+24
     cmp r15d, loop_dbg_found
     je .dbg_found+44
     cmp r15d, loop_get_pass
@@ -278,6 +307,8 @@ _start:
     je .print_success
     cmp r15d, loop_fake_dbg_found
     je .dbg_found
+    ; cmp r15d, loop_fake_decrypt_code
+    ; je .decrypt_code
     cmp r15d, loop_exit_0
     je .exit_0
     cmp r15d, loop_fake_check_pass
@@ -339,6 +370,13 @@ _start:
     jmp .main_loop
     db 0xc1,0x96,0x9c,0x80,0xcd,0x02,0x53,0x6d,0x65,0xf0,0xf3,0x54,0xe5,0x0d,0x0e,0xd3,0x7d
 
+    ; .decrypt_code:
+    ; ; Decrypt the .code section to retreive the password
+    ; db 0xe4,0x8d,0xa5,0xb6,0x30,0x43,0x9c,0xfe,0x70,0xd7,0x38,0x69,0x08,0xfc,0x67,0x48,0x61,0x4a,0x3c,0x02,0x2c,0xc6,0x89,0xab
+    ; decrypt_data
+    ; jmp .main_loop
+    ; db 0x0b,0x32,0xc5,0xd2,0xa1,0x71,0x97,0xa3,0x8f,0xe1,0x4b,0x26
+
     .print_success:
     db 0x80,0xe9,0x76,0x94,0x0a,0x24,0x91,0x19,0x92,0x30,0xd8,0xcd,0x5d,0x56,0x61,0xa7,0xb7,0xcc,0xc0,0x81,0x72,0xc0,0x68,0xb9,0x27
     decrypt_msg msg_success, len_success
@@ -384,3 +422,9 @@ _start:
         0xe7,0xa9,0x3a,0x3b,0xa4,0x11,0xf3,0x47,0x6b,0xd5, \
         0xbc,0x80,0x9c,0x48,0x63,0xf2,0xc4,0xd4,0x64,0x48, \
         0xb5,0x9f,0xe2,0xbf,0xf9,0x4b,0xa0,0x14,0x65,0xce
+
+    ; Calculate call address
+    ; mov rax, 0x4fd7fe1f8d2e4ed3     ; Encrypted address .main_loop
+    ; mov rbx, [check_succes_callkey]
+    ; xor rax, rbx
+    ; jmp rax

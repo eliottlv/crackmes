@@ -2,6 +2,6 @@
 
 ## Compilation
 
-- Mode debug : `make all_dbg`
+- Mode debug : `make`
 - Mode release : `make all`
 - Clean : `make clean`

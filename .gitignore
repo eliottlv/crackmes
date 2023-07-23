@@ -2,3 +2,4 @@ crackme_*/*.run
 crackme_*/*.o
 test*
 .gdb_history
+abc*
