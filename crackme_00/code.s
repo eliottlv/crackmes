@@ -98,10 +98,9 @@ BITS 64
 %endmacro
 
 ; Calculate hash
-%macro hash 1
+%macro hash 0
 	mov rax, 0					; Loop counter (one iter)
-	mov cl, byte [rsp]			; String size
-	inc rsp
+	mov cl, byte [pwd_len]	    ; String size
 	; Clean registers
 	xor r10, r10
     mov r11, r10
@@ -111,7 +110,7 @@ BITS 64
 	mov r15, r10
 	mov r14d, dword [init1]		; Precedent result
 	mov r15d, dword [init2]		; Precedent result
-	.hash_loop%1:
+	.hash_loop:
 	; First char
 	mov r10b, [_buff+rax]
 	;mov r10b, [msg+rax]		; Get one char
@@ -175,8 +174,8 @@ BITS 64
 
 	; Loop control (one iter)
 	inc rax
-	cmp rax, pwd_len-1
-	jne .hash_loop%1
+	cmp al, cl
+	jne .hash_loop
 
 	; Merge results
 	shl r14, 32
@@ -187,6 +186,7 @@ section .bss
     _buff:
     buff resb       256         ; Reserver 256 octets
     buff_len equ    $-buff
+    pwd_len resb    1
 
 section .data
     ; ./encryptor.py "Password : " + key
@@ -206,7 +206,6 @@ section .data
 	init2 dd		                    0xb0a2b143
 	key1 dd			                    0x8fd381ed
 	key2 dd			                    0x425f162a
-    pwd_len equ                         16
 
 section .text
 global _start
@@ -319,6 +318,9 @@ _start:
     ; Store input password
     db 0x29,0xe1,0x26,0x5f,0xa5,0xef,0xfd,0xab,0xf7,0x25,0x3d,0x54,0x16,0xc7
     read buff, buff_len
+    dec rax
+    dec rax
+    mov [pwd_len], rax
     mov r15d, loop_check_pass
     jmp .main_loop
     db 0x89,0xcc,0x49,0x0c,0xc9,0xa8,0xf9,0x84,0x90,0x4b,0x60,0x30,0xc9,0x9b,0x1b,0x81,0xfd,0x60,0xad,0x84
@@ -326,10 +328,8 @@ _start:
     .check_pass:
     ; Check password
     db 0xae,0x7a,0x5a,0xab,0xe7,0xf0,0xf8,0x5c,0x24,0x7f,0x0c,0x27,0xb9,0xf6,0xf0,0xbb,0x25,0xdf,0x3d,0x1f,0x52,0xcd
-    ; Add string size
-    dec rsp
-	mov byte [rsp], byte pwd_len
-    hash 0
+    hash
+    .test1:
     ; Compare hash
     cmp r14, [real_hash]
     mov rbx, loop_success
@@ -364,7 +364,8 @@ _start:
     call .main_loop         ; Dead code
 
     .exit_2:
-    exit 2
+    ; 2 or not ;-)
+    exit 1
     db 0xef,0x99,0x95,0x93,0x62,0xaf,0x28
     jmp .main_loop          ; Dead code
 
