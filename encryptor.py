@@ -30,7 +30,7 @@ data = list(argv[1].encode())
 if (len(data) % 2) != 0:
     data.append(0)
 
-# Zip bytes by pairs df 2 bytes.
+# Zip bytes by pairs of 2 bytes.
 data_even = [i for idx, i in enumerate(data) if idx%2 == 0]
 data_not_even = [i for idx, i in enumerate(data) if idx%2 == 1]
 data = list(zip(data_even, data_not_even))
