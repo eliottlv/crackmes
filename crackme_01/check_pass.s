@@ -10,11 +10,11 @@ BITS 64
 %define loop_print_success          0x2198d42f
 
 jmp .start
-real_hash dq	                    0xed9822325a6c999e      ; @P3E%3#yY5!#@hM5
-init1 dd		                    0xbfe5164c
-init2 dd		                    0x64d1ada1
-key1 dd			                    0x76ffa4bb
-key2 dd			                    0xd8689c54
+real_hash dq	                    0xb19b027114644e82      ; @P3E%3#yY5!#@hM5
+init1 dq		                    0xded80c612eaed1e6
+init2 dq		                    0x1d66514734a9cb36
+key1 dq			                    0x4613031ad0de432c
+key2 dq			                    0xbc66534f00e74f08
 
 ; Calculate hash
 %macro hash 0
@@ -29,12 +29,11 @@ key2 dd			                    0xd8689c54
     mov r13, r10
     mov r14, r10
 	mov r15, r10
-	mov r14d, dword [rdx+init1]		; Precedent result
-	mov r15d, dword [rdx+init2]		; Precedent result
+	mov r14, [rdx+init1]		; Precedent result
+	mov r15, [rdx+init2]		; Precedent result
 	.hash_loop:
 	; First char
-	mov r10b, [rbx+rax]
-	;mov r10b, [msg+rax]		; Get one char
+	mov r10b, [rbx+rax]		; Get one char
 	mov r11b, r10b
 	mov r12b, r10b
 	mov r13b, r10b
@@ -51,16 +50,27 @@ key2 dd			                    0xd8689c54
 	add r10d, r11d
 	add r10d, r12d
 	add r10d, r13d
+    ; Shift 2
+	shl r11, 8
+	shl r12, 8*3
+	shl r13, 8*5
+	; Extend output 2
+	add r10, r11
+	add r10, r12
+	add r10, r13
+	; Add final byte
+	mov r11b, r10b
+	shl r11, 8*3
+	add r10, r11
 	; Mix
-	xor r10d, dword [rdx+key1]
+	xor r10, [rdx+key1]
 	; Clear tmp registers
 	xor r11, r11
 	mov r12, r11
 	mov r13, r11
 
 	; Second char
-	mov r9b, [rbx+rax+1]
-	;mov r9b, [msg+rax+1]	; Get one char+1
+	mov r9b, [rbx+rax+1]	; Get one char+1
 	mov r11b, r9b
 	mov r12b, r9b
 	mov r13b, r9b
@@ -77,18 +87,30 @@ key2 dd			                    0xd8689c54
 	add r9d, r11d
 	add r9d, r12d
 	add r9d, r13d
+    ; Shift 2
+	shl r11, 8
+	shl r12, 8*3
+	shl r13, 8*5
+	; Extend output 2
+	add r9, r11
+	add r9, r12
+	add r9, r13
+	; Add final byte
+	mov r11b, r9b
+	shl r11, 8*3
+	add r9, r11
 	; Mix
-	xor r9d, dword [rdx+key2]
+	xor r9, [rdx+key2]
 	; Clear tmp registers
 	xor r11, r11
 	mov r12, r11
 	mov r13, r11
 
-	; Mix with preceding result
-	xor r9d, r14d
-	xor r10d, r15d
-	mov r14d, r9d
-	mov r15d, r10d
+	; Mix with previous result
+	add r9, r14
+	add r10, r15
+	mov r14, r9
+	mov r15, r10
 	; Clean results
 	xor r9, r9
 	xor r10, r10
@@ -99,8 +121,8 @@ key2 dd			                    0xd8689c54
 	jne .hash_loop
 
 	; Merge results
-	shl r14, 32
-	add r14, r15
+	xor r14, r15
+	xor r15, r15
 %endmacro
 
 .start:

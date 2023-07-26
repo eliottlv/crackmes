@@ -53,7 +53,7 @@ section .data
     key_c8 dq 0x407bc358e5091036
     key_c9 dq 0x67a19aafabf62d84
     key_c10 dq 0x3eba7469d35249ed
-    key_c11 dq 0x466df7b1a7e2893d
+    key_c11 dq 0x0cd8b0ce55b43b3c
 
 section .code exec write align=8
     _code:
@@ -264,40 +264,50 @@ section .code exec write align=8
 
     ; nasm -f bin -o tmp.o crackme_01/check_pass.s; ./asmcrypt.py tmp.o
     .check_pass:
-    dq 0x645faddd3e7c91d6
-    dq 0xebcc4854b1ae64a5
-    dq 0xda39814e0359edec
-    dq 0x076df7b1a75a5155
-    dq 0x94e4bb522eae82b7
-    dq 0xcf202438ea30b870
-    dq 0x0bbb7efc726bc4e9
-    dq 0x466dfd032ca65eb4
-    dq 0x466df7bf1d69cd3d
-    dq 0x03be7ff4a4f60379
-    dq 0x8cadb6642fa75db5
-    dq 0x8aadb6a36c22c83b
-    dq 0xa5acb6b86a22c832
-    dq 0xa3acb6a14323c825
-    dq 0x038ff6f47de3cc35
-    dq 0x466de52394a6633c
-    dq 0x0bb17efc7cd3c43d
-    dq 0x036cf4fd2da654b4
-    dq 0x8be5b27d2fa742b5
-    dq 0x45a637f0b62b497c
-    dq 0x41a037f0b52e497c
-    dq 0x568936f0bf01487c
-    dq 0x03b4f6f4af07487c
-    dq 0xcc5eb358a6a7683c
-    dq 0x0bb6c6fca7e2892b
-    dq 0xb75cb26c2eaf55b4
-    dq 0xcf283938e218b878
-    dq 0x0ebfc6fc6ed3c4ea
-    dq 0xb93372be6fda49c2
-    dq 0x4720d75766ab76c2
-    dq 0x466df7b315d9c5c3
-    dq 0xbe324e903f36a686
-    dq 0x49290cf5a8a6091c
-    dq 0xd6fd677896aa7078
+    dq 0x0ea9a4aa1b3613d7
+    dq 0x00b99e6084528aa7
+    dq 0x5d9f84679e82e5e4
+    dq 0x0fc260101698265a
+    dq 0x5f97b0291abc7d2f
+    dq 0x4dd8b0ce550c875a
+    dq 0xde51fc2ddcf830b6
+    dq 0x8595634718660a71
+    dq 0x410e3983803d76e8
+    dq 0x0cd8ba7cdef8ecb5
+    dq 0x0cd8b0dcef3f773c
+    dq 0x490b388b56a0b178
+    dq 0xc618f11bddf1efb4
+    dq 0xc018f1dc9e747a3a
+    dq 0xef19f1c798747a33
+    dq 0xe919f1deb1757a24
+    dq 0x493ab18b8fb57e34
+    dq 0xcd91b82d94fdd13d
+    dq 0x0d95982b94fd23d8
+    dq 0x4932b183b7b576e6
+    dq 0x0d95a82d94fde8b4
+    dq 0x0cd8b0d4c78777e6
+    dq 0x85956c47186f0a71
+    dq 0x849db1cd193e7fe1
+    dq 0x4d15388b993c7ef7
+    dq 0x4ddb7b0e14a5f2fc
+    dq 0x4ddf7d0e14a6f7fc
+    dq 0x4dc8540f14acd8fd
+    dq 0x0d9d69cf10bcdefd
+    dq 0x043b7187bcb57edd
+    dq 0x243d71874d50fa75
+    dq 0x0d9551cf186d3a71
+    dq 0x143b71879e3c7ed5
+    dq 0x0cfa3afd196d3a71
+    dq 0xd051fd1564f93b3c
+    dq 0x0d9541cf1869b271
+    dq 0x410f39839b3d76c6
+    dq 0xcc27f81c64f9f20d
+    dq 0xf3274feed0bbf304
+    dq 0x37944fff184a0a71
+    dq 0xd8f70bce55b4398e
+    dq 0x485891360a0d1aa4
+    dq 0x4421f5c1114f7f33
+    dq 0x9c48205ec524f20d
     len_code_11 equ $-.check_pass
     jmp _start.main_loop
 
@@ -320,8 +330,6 @@ _start:
     .dbg_check_v2:
     decrypt_code _code.dbg_check_v2, key_c2, len_code_2
     jmp _code.dbg_check_v2
-
-    ;mov r15d, loop_print_prompt
 
     ;;;;;;;;;;;;;;;
     ;;;;;; Main Loop
@@ -402,7 +410,7 @@ _start:
     mov r11, pwd_len
     mov r12, _buff
     ; Check password
-    cmp byte [_code.check_pass], 0xd6     ; Don't decrypt a second time
+    cmp byte [_code.check_pass], 0xd7     ; Don't decrypt a second time
     jne _code.check_pass
     decrypt_code _code.check_pass, key_c11, len_code_11
     jmp _code.check_pass
