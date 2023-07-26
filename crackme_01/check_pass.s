@@ -6,8 +6,8 @@ BITS 64
 ; - r11 : pwd_len addr
 ; - r12 : _buff
 
-%define loop_failed                 0x72605214
-%define loop_success                0xa5db20db
+%define loop_print_failed           0x8021f85f
+%define loop_print_success          0x2198d42f
 
 jmp .start
 real_hash dq	                    0xed9822325a6c999e      ; @P3E%3#yY5!#@hM5
@@ -108,8 +108,8 @@ key2 dd			                    0xd8689c54
 hash
 ; Compare hash
 cmp r14, [rdx+real_hash]
-mov rbx, loop_success
-mov rcx, loop_failed
+mov rbx, loop_print_success
+mov rcx, loop_print_failed
 cmove r15d, ebx
 cmovne r15d, ecx
 ; Reset rcx

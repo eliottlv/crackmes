@@ -1,8 +1,8 @@
 BITS 64
 %use altreg
 
-%define loop_print_prompt           0xfb439931
-%define loop_get_pass               0xb5cb80a2
+%define loop_print_prompt           0xa8c20c6e
+%define loop_get_pass               0xc39fa982
 
 jmp .start
 ; ./encryptor.py "Password : " + key

@@ -1,8 +1,8 @@
 BITS 64
 %use altreg
 
-%define loop_print_success          0x50a4d741
-%define loop_exit_0                 0xdd8aeb7a
+%define loop_print_success          0x2198d42f
+%define loop_exit_0                 0x6f444add
 
 jmp .start
 ; ./encryptor.py "Success !"\n + key

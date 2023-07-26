@@ -1,8 +1,8 @@
 BITS 64
 %use altreg
 
-%define loop_dbg_found              0x1221a352
-%define loop_exit_1v2               0x8dff7d3f
+%define loop_dbg_found              0xcd8699c1
+%define loop_exit_1v2               0x4e788b25
 
 jmp .start
 ; ./encryptor.py "Debugger detected :-)"\n + key

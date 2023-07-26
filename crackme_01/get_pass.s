@@ -1,7 +1,7 @@
 BITS 64
 %use altreg
 
-%define loop_check_pass             0x6c5f8286
+%define loop_check_pass             0x10f29a27
 
 ; Input :
 ; - r10 : buff addr

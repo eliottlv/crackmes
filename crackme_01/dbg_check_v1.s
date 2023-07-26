@@ -1,7 +1,7 @@
 BITS 64
 
-%define loop_dbg_found              0x1221a352
-%define loop_print_prompt           0xfb439931
+%define loop_dbg_found              0xcd8699c1
+%define loop_print_prompt           0xa8c20c6e
 
 ; Check for debugger (self ptrace)
 xor rax, rax
